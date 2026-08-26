@@ -33,7 +33,9 @@ jobs:
           mkdir -p /tmp/g1
           printf 'HELLO\r\n\r\nWORLD 42\r\n' > /tmp/g1/NOTES.txt
           node apps/cli/bin/calcconv.js /tmp/g1/NOTES.txt -o /tmp/g1
-          node apps/cli/bin/calcconv.js /tmp/g1/NOTES.g1e -o /tmp/g1/back
+          # Written upper case on purpose, matching the calculator's own
+          # storage listing. Linux cares about that and Windows does not.
+          node apps/cli/bin/calcconv.js /tmp/g1/NOTES.G1E -o /tmp/g1/back
           diff /tmp/g1/NOTES.txt /tmp/g1/back/NOTES.txt
 
       - name: TI round trip, including the pairs longest-match gets wrong

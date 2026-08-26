@@ -17,6 +17,11 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: npm
+      # The CLI reaches the codecs by package name, so the workspace has to be
+      # linked before any of the steps below can run it.
+      - run: npm ci
+      - run: npm run typecheck
       - run: node --test "packages/core/test/*.test.js"
       - name: command line smoke test
         shell: bash

@@ -1,0 +1,20 @@
+# Source is checked out with the platform's own line endings and stored with
+# LF, so a Windows clone and a Linux clone produce identical commits.
+* text=auto eol=lf
+
+# Calculator files are binary. Never let a checkout rewrite bytes inside one —
+# the whole project is a claim that these round-trip unchanged.
+*.g1e binary
+*.g1m binary
+*.8xp binary
+*.8xl binary
+*.8xm binary
+*.83p binary
+*.82p binary
+*.bmp binary
+*.png binary
+*.ico binary
+
+# Generated: one token per line, so a real diff is readable, but it is not
+# hand-edited and does not need reviewing line by line.
+packages/core/src/tokens-8x.js linguist-generated=true

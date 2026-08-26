@@ -1,0 +1,40 @@
+{
+  "name": "calcconv-core",
+  "version": "0.1.0",
+  "description": "File format codecs for Casio fx-9860G and TI-83/84 graphing calculators. Zero dependencies, runs in Node and the browser.",
+  "type": "module",
+  "main": "src/index.js",
+  "exports": {
+    ".": "./src/index.js",
+    "./g1e": "./src/g1e.js",
+    "./charset": "./src/charset.js",
+    "./ti8x": "./src/ti8x.js",
+    "./ti8x-data": "./src/ti8x-data.js",
+    "./tokens-8x": "./src/tokens-8x.js"
+  },
+  "files": [
+    "src"
+  ],
+  "keywords": [
+    "fx-9860g",
+    "g1e",
+    "eactivity",
+    "ti-83",
+    "ti-84",
+    "ti-basic",
+    "8xp",
+    "8xl",
+    "tokenizer",
+    "calculator",
+    "file-format"
+  ],
+  "author": "Nataniel0212",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Nataniel0212/calculator-file-converter.git",
+    "directory": "packages/core"
+  },
+  "homepage": "https://github.com/Nataniel0212/calculator-file-converter#readme",
+  "bugs": "https://github.com/Nataniel0212/calculator-file-converter/issues"
+}

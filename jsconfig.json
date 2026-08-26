@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "lib": ["ES2022", "DOM"],
+    "checkJs": true,
+    "noEmit": true,
+    "strict": true,
+    "noImplicitAny": false,
+    "skipLibCheck": true
+  },
+  "include": ["packages/core/src", "apps/cli/bin", "apps/web/app.js", "apps/web/lib", "scripts"],
+  "exclude": ["node_modules", "apps/web/vendor", "dist"]
+}

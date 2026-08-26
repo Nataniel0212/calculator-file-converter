@@ -1,0 +1,40 @@
+name: release
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  desktop:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            artifact: 'apps/desktop/out/*.exe'
+          - os: ubuntu-latest
+            artifact: 'apps/desktop/out/*.AppImage'
+          - os: macos-latest
+            artifact: 'apps/desktop/out/*.dmg'
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install
+        working-directory: apps/desktop
+      - run: npm run build
+        working-directory: apps/desktop
+      - uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: ${{ matrix.artifact }}
+          draft: true
+          body: |
+            Portable builds of File Converter. Nothing is installed and nothing is
+            uploaded — the app converts files entirely on your own machine.

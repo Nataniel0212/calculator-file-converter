@@ -1,0 +1,46 @@
+name: test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node --test "packages/core/test/*.test.js"
+      - name: command line smoke test
+        shell: bash
+        run: |
+          mkdir -p /tmp/g1
+          printf 'HELLO\r\n\r\nWORLD 42\r\n' > /tmp/g1/NOTES.txt
+          node apps/cli/bin/calcconv.js /tmp/g1/NOTES.txt -o /tmp/g1
+          node apps/cli/bin/calcconv.js /tmp/g1/NOTES.g1e -o /tmp/g1/back
+          diff /tmp/g1/NOTES.txt /tmp/g1/back/NOTES.txt
+
+      - name: TI round trip, including the pairs longest-match gets wrong
+        shell: bash
+        run: |
+          mkdir -p /tmp/ti
+          printf 'Disp "L1 vs L\\.1"\nDelVar L\\.1\n5->L\\.1\n' > /tmp/ti/GUESS.txt
+          node apps/cli/bin/calcconv.js /tmp/ti/GUESS.txt -o /tmp/ti --to 8xp
+          node apps/cli/bin/calcconv.js /tmp/ti/GUESS.8xp -o /tmp/ti/text
+          node apps/cli/bin/calcconv.js /tmp/ti/text/GUESS.txt -o /tmp/ti/back
+          cmp /tmp/ti/GUESS.8xp /tmp/ti/back/GUESS.8xp
+
+      - name: spreadsheet column to a calculator list and back
+        shell: bash
+        run: |
+          mkdir -p /tmp/csv
+          printf 'langd\n1,5\n1,72\n1,68\n' > /tmp/csv/LANGD.csv
+          node apps/cli/bin/calcconv.js /tmp/csv/LANGD.csv -o /tmp/csv
+          node apps/cli/bin/calcconv.js /tmp/csv/LANGD.8xl -o /tmp/csv/back
+          grep -q '^1.72$' /tmp/csv/back/LANGD.csv

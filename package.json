@@ -1,0 +1,30 @@
+{
+  "name": "calculator-file-converter",
+  "private": true,
+  "description": "Convert graphing calculator files to plain text and back, in the browser, from the command line, or as a desktop app.",
+  "license": "MIT",
+  "author": "Nataniel0212",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Nataniel0212/calculator-file-converter.git"
+  },
+  "homepage": "https://Nataniel0212.github.io/calculator-file-converter/",
+  "bugs": "https://github.com/Nataniel0212/calculator-file-converter/issues",
+  "type": "module",
+  "workspaces": [
+    "packages/*",
+    "apps/cli"
+  ],
+  "scripts": {
+    "test": "node --test \"packages/core/test/*.test.js\"",
+    "typecheck": "tsc -p jsconfig.json"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "@types/wicg-file-system-access": "^2023.10.7",
+    "typescript": "^5.7.2"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

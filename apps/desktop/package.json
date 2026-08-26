@@ -1,0 +1,43 @@
+{
+  "name": "calcconv-desktop",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Desktop build of File Converter, for Casio fx-9860G and TI-83/84 graphing calculator files.",
+  "type": "module",
+  "main": "main.js",
+  "scripts": {
+    "start": "node ../../scripts/sync-core.js && electron .",
+    "build": "node ../../scripts/sync-core.js && electron-builder --publish never",
+    "test:ui": "node ../../scripts/sync-core.js && electron test/ui.mjs"
+  },
+  "devDependencies": {
+    "electron": "^33.0.0",
+    "electron-builder": "^25.0.0"
+  },
+  "build": {
+    "appId": "dev.calcconv.app",
+    "productName": "File Converter",
+    "directories": {
+      "output": "out"
+    },
+    "files": [
+      "main.js",
+      "package.json",
+      "../web/**/*"
+    ],
+    "win": {
+      "target": "portable"
+    },
+    "portable": {
+      "artifactName": "FileConverter-${version}-portable.exe"
+    },
+    "linux": {
+      "target": "AppImage",
+      "category": "Utility"
+    },
+    "mac": {
+      "target": "dmg",
+      "category": "public.app-category.utilities"
+    }
+  }
+}

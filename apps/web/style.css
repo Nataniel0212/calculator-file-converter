@@ -1,0 +1,813 @@
+/*
+ * calcconv
+ *
+ * Laid out as a tool, not a web page: a bordered window with a title bar,
+ * labelled form rows, a file list, and a status bar with the one button that
+ * actually does something. Hairlines and square corners throughout — no
+ * rounded cards, no blurred shadows, no gradients. The only saturated colour
+ * in the whole interface is the green that means "done".
+ */
+
+:root {
+  color-scheme: light dark;
+
+  --page: #d3d5ce;
+  --panel: #f7f7f4;
+  --panel-2: #edeee8;
+  --inset: #ffffff;
+  --ink: #15181a;
+  --ink-2: #575d59;
+  --ink-3: #8a908c;
+  --rule: #ccccc5;
+  --rule-2: #b3b4ac;
+  --edge: #15181a;
+
+  --lcd: #a4ba81;
+  --lcd-ink: #16200a;
+  --bezel: #2f342c;
+
+  --led: #1f7a37;
+  --amber: #8f5800;
+  --red: #9c3320;
+
+  --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --mono: ui-monospace, "Cascadia Mono", "SF Mono", Consolas, "Liberation Mono", monospace;
+  --label: 600 10.5px/1 var(--sans);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --page: #0c0e0d;
+    --panel: #171a18;
+    --panel-2: #1e2220;
+    --inset: #121514;
+    --ink: #e7e9e6;
+    --ink-2: #99a09b;
+    --ink-3: #6b726d;
+    --rule: #2b302c;
+    --rule-2: #3a403b;
+    --edge: #000000;
+
+    --led: #4ec06d;
+    --amber: #d19a3e;
+    --red: #e0705a;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* Rows and fields set their own `display`, which would otherwise beat the
+   browser's `[hidden] { display: none }` and leave hidden things on screen. */
+[hidden] {
+  display: none !important;
+}
+
+body {
+  margin: 0;
+  padding: 30px 20px 44px;
+  background: var(--page);
+  color: var(--ink);
+  font: 14px/1.5 var(--sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+.sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+
+.muted {
+  color: var(--ink-2);
+  font-size: 12.5px;
+}
+
+a {
+  color: inherit;
+  text-underline-offset: 2px;
+}
+
+/* ------------------------------------------------------------- app shell */
+
+.app {
+  max-width: 880px;
+  margin: 0 auto;
+  background: var(--panel);
+  border: 1px solid var(--edge);
+  display: flex;
+  flex-direction: column;
+}
+
+.titlebar {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 11px 16px;
+  border-bottom: 1px solid var(--edge);
+  background: var(--panel-2);
+}
+
+/* a scrap of LCD with two dark pixels in it */
+.mark {
+  width: 20px;
+  height: 13px;
+  flex: none;
+  background: var(--lcd);
+  border: 1px solid var(--bezel);
+  background-image: linear-gradient(var(--lcd-ink) 0 0), linear-gradient(var(--lcd-ink) 0 0);
+  background-size: 4px 3px, 7px 3px;
+  background-position: 3px 2px, 3px 7px;
+  background-repeat: no-repeat;
+}
+
+.titlebar h1 {
+  margin: 0;
+  font: 600 15px/1 var(--mono);
+  letter-spacing: -0.02em;
+}
+
+.titlebar-sub {
+  color: var(--ink-3);
+  font-size: 12.5px;
+  margin-left: auto;
+}
+
+@media (max-width: 560px) {
+  .titlebar-sub {
+    display: none;
+  }
+}
+
+/* ------------------------------------------------------------- groups */
+
+.group {
+  padding: 14px 16px 16px;
+  border-bottom: 1px solid var(--rule);
+}
+
+.group-title {
+  margin: 0 0 11px;
+  font: var(--label);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.group-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 11px;
+  flex-wrap: wrap;
+}
+
+.group-head .group-title {
+  margin: 0;
+}
+
+.group-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Narrower than a form control: it sits in a row of buttons, not in a form. */
+.filter {
+  width: 150px;
+  padding: 4px 7px;
+}
+
+/* The empty state for a filter that matches nothing. */
+td.pad {
+  padding: 14px 10px;
+}
+
+/* ------------------------------------------------------------- form rows */
+
+.row {
+  display: grid;
+  grid-template-columns: 104px minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+  padding: 3px 0;
+}
+
+/* A row whose control carries notes under it is taller than its label, so the
+   label sits with the control rather than floating in the middle of the block. */
+.row:has(.limits-box) {
+  align-items: start;
+}
+
+.row:has(.limits-box) .row-label {
+  padding-top: 6px;
+}
+
+.row + .row {
+  margin-top: 7px;
+}
+
+@media (max-width: 560px) {
+  .row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 5px;
+  }
+}
+
+.row-label {
+  font-size: 12.5px;
+  color: var(--ink-2);
+}
+
+.control {
+  width: 100%;
+  max-width: 420px;
+  font: 13.5px/1.2 var(--sans);
+  color: var(--ink);
+  background: var(--inset);
+  border: 1px solid var(--rule-2);
+  padding: 7px 30px 7px 9px;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath d='M0 0h10L5 6z' fill='%23575d59'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 9px;
+}
+
+.control:focus {
+  outline: 2px solid var(--led);
+  outline-offset: -1px;
+}
+
+.control option:disabled {
+  color: var(--ink-3);
+}
+
+.radios {
+  display: flex;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+
+.radio,
+.check {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.check {
+  color: var(--ink-2);
+  font-size: 12.5px;
+}
+
+.radio input,
+.check input {
+  accent-color: var(--led);
+  margin: 0;
+}
+
+.radio.off {
+  color: var(--ink-3);
+  cursor: not-allowed;
+}
+
+/* ------------------------------------------------------------- buttons */
+
+.btn {
+  font: 500 12.5px/1 var(--sans);
+  padding: 8px 13px;
+  border: 1px solid var(--rule-2);
+  background: var(--panel);
+  color: var(--ink);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.btn:hover:not(:disabled) {
+  border-color: var(--ink);
+  background: var(--panel-2);
+}
+
+.btn.quiet {
+  color: var(--ink-2);
+  border-color: var(--rule);
+}
+
+.btn.primary {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--panel);
+  padding: 8px 18px;
+  font-weight: 600;
+}
+
+.btn.primary:hover:not(:disabled) {
+  background: var(--led);
+  border-color: var(--led);
+  color: #fff;
+}
+
+.btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--led);
+  outline-offset: 1px;
+}
+
+/* ------------------------------------------------------------- file list */
+
+.source-row {
+  margin-bottom: 11px;
+}
+
+.filelist {
+  border: 1px solid var(--rule-2);
+  background: var(--inset);
+  min-height: 132px;
+  max-height: 320px;
+  overflow: auto;
+}
+
+.filelist:focus-visible {
+  outline: 2px solid var(--led);
+  outline-offset: -2px;
+}
+
+.filelist.dragging {
+  outline: 2px dashed var(--led);
+  outline-offset: -3px;
+  background: var(--panel-2);
+}
+
+.empty {
+  margin: 0;
+  padding: 46px 16px;
+  text-align: center;
+  color: var(--ink-3);
+  font-size: 13px;
+}
+
+.empty b {
+  color: var(--ink-2);
+  font-weight: 600;
+}
+
+.queue {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.queue th {
+  position: sticky;
+  top: 0;
+  padding: 7px 11px;
+  text-align: left;
+  font: var(--label);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  background: var(--panel-2);
+  border-bottom: 1px solid var(--rule);
+}
+
+.queue td {
+  padding: 6px 11px;
+  border-bottom: 1px solid var(--rule);
+  vertical-align: middle;
+}
+
+.queue tr:last-child td {
+  border-bottom: none;
+}
+
+.queue tbody tr.clickable {
+  cursor: pointer;
+}
+
+.queue tbody tr.clickable:hover {
+  background: var(--panel-2);
+}
+
+.queue tbody tr.selected {
+  background: var(--panel-2);
+  box-shadow: inset 3px 0 0 var(--ink);
+}
+
+.col-status {
+  width: 30px;
+}
+
+.col-num {
+  width: 70px;
+  text-align: right;
+}
+
+.queue td.col-num {
+  text-align: right;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--ink-2);
+  font-variant-numeric: tabular-nums;
+}
+
+.col-act {
+  width: 34px;
+}
+
+.name {
+  font-family: var(--mono);
+  font-size: 12.5px;
+  word-break: break-all;
+}
+
+.name.out {
+  font-weight: 600;
+}
+
+.name.muted {
+  color: var(--ink-3);
+  font-weight: 400;
+}
+
+.x {
+  font: 400 13px/1 var(--sans);
+  width: 22px;
+  height: 22px;
+  border: 1px solid transparent;
+  background: none;
+  color: var(--ink-3);
+  cursor: pointer;
+}
+
+.x:hover {
+  border-color: var(--rule-2);
+  color: var(--ink);
+}
+
+.notes {
+  margin: 0;
+  padding: 0 0 4px 15px;
+  list-style: none;
+}
+
+.notes li {
+  position: relative;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--amber);
+}
+
+.notes li::before {
+  content: '';
+  position: absolute;
+  left: -11px;
+  top: 6px;
+  width: 4px;
+  height: 4px;
+  background: currentColor;
+}
+
+.notes li.err {
+  color: var(--red);
+}
+
+/* A note that names a line is a way to get to it. It stays typographically a
+   note — the affordance is the underline on hover, not a button shape. */
+.note-link {
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
+.note-link:hover,
+.note-link:focus-visible {
+  text-decoration: underline;
+}
+
+.note-link:focus-visible {
+  outline: 2px solid var(--led);
+  outline-offset: 2px;
+}
+
+tr.notes-row td {
+  padding-top: 0;
+}
+
+/* ------------------------------------------------------------- lamps */
+
+.lamp {
+  display: block;
+  width: 8px;
+  height: 8px;
+  flex: none;
+  background: var(--led);
+}
+
+.lamp.warn {
+  background: var(--amber);
+}
+
+.lamp.err {
+  background: var(--red);
+}
+
+.lamp.skip,
+.lamp.idle {
+  background: transparent;
+  border: 1px solid var(--ink-3);
+}
+
+td .lamp {
+  margin: 0 auto;
+}
+
+/* saved: the row states plainly that the file left the building */
+.tick {
+  display: block;
+  text-align: center;
+  font-size: 13px;
+  line-height: 1;
+  font-weight: 700;
+  color: var(--led);
+}
+
+.queue tbody tr.saved .col-out .name {
+  color: var(--led);
+}
+
+.status-text.done {
+  color: var(--led);
+  font-weight: 600;
+}
+
+.btn.primary.done,
+.btn.primary.done:hover {
+  background: var(--led);
+  border-color: var(--led);
+  color: #fff;
+}
+
+/* ------------------------------------------------------------- destination */
+
+.dest {
+  display: flex;
+  align-items: stretch;
+  gap: 9px;
+  max-width: 560px;
+}
+
+/* reads as a path field: same height as the button beside it, never editable */
+.path {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--ink-2);
+  background: var(--panel-2);
+  border: 1px solid var(--rule);
+  padding: 0 10px;
+  min-width: 0;
+  word-break: break-all;
+}
+
+.path::before {
+  content: '';
+  width: 11px;
+  height: 9px;
+  margin-right: 8px;
+  flex: none;
+  border: 1px solid currentColor;
+  border-top-width: 3px;
+  opacity: 0.55;
+}
+
+/* ------------------------------------------------------------- preview */
+
+.preview {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 16px;
+}
+
+@media (max-width: 720px) {
+  .preview {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.lcd {
+  background: var(--lcd);
+  color: var(--lcd-ink);
+  border: 3px solid var(--bezel);
+  padding: 9px 10px;
+  font: 12.5px/1.5 var(--mono);
+  white-space: pre;
+  overflow: auto;
+  max-height: 300px;
+  min-height: 110px;
+}
+
+.lcd .head {
+  font-weight: 700;
+}
+
+.lcd .over {
+  background: var(--lcd-ink);
+  color: var(--lcd);
+}
+
+/* A token boundary is not a character the calculator shows, so it is drawn as
+   a hairline between the two tokens rather than as the \. that carries it. */
+.lcd .boundary {
+  display: inline-block;
+  width: 0;
+  height: 1.05em;
+  vertical-align: text-bottom;
+  border-left: 1px solid currentColor;
+  opacity: 0.55;
+}
+
+/* Likewise a byte the token table cannot name: shown as its hex, boxed, so it
+   does not read as the letters that spell it. */
+.lcd .raw {
+  padding: 0 2px;
+  border: 1px solid currentColor;
+  border-radius: 2px;
+  font-size: 0.85em;
+  opacity: 0.85;
+}
+
+.hint {
+  margin: 7px 0 0;
+  font-size: 12px;
+  color: var(--ink-3);
+}
+
+/* What the chosen calculator will and will not take. These sit under the
+   control that picks it, so the constraint is read where the choice is made
+   rather than remembered from documentation — but folded away, because it is
+   reference: everyone needs it once and nobody needs it twice. */
+.limits-box {
+  margin-top: 8px;
+}
+
+.limits-box > summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  width: fit-content;
+  font-size: 12px;
+  /* This line is the whole point of the panel: it is what stops somebody
+     discovering on the calculator that Å became A. Quiet, but not chrome. */
+  color: var(--ink-2);
+  cursor: pointer;
+  list-style: none;
+}
+
+.limits-box > summary::-webkit-details-marker {
+  display: none;
+}
+
+/* A caret that turns, rather than the browser's own triangle. */
+.limits-box > summary::before {
+  content: '';
+  width: 0;
+  height: 0;
+  border: 3.5px solid transparent;
+  border-left-color: currentColor;
+  transform: translateX(1px);
+}
+
+.limits-box[open] > summary::before {
+  border-left-color: transparent;
+  border-top-color: currentColor;
+  transform: translateY(2px);
+}
+
+.limits-box > summary:hover {
+  color: var(--ink-2);
+}
+
+.limits-box > summary:focus-visible {
+  outline: 2px solid var(--led);
+  outline-offset: 2px;
+}
+
+.limits {
+  margin: 6px 0 0;
+  padding: 0;
+  max-width: 62ch;
+  list-style: none;
+}
+
+.limits li {
+  position: relative;
+  padding-left: 15px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+
+.limits li + li {
+  margin-top: 3px;
+}
+
+.limits li::before {
+  content: '';
+  position: absolute;
+  left: 3px;
+  top: 8px;
+  width: 4px;
+  height: 1px;
+  background: var(--ink-3);
+}
+
+.limits code,
+.hint code {
+  padding: 0 3px;
+  font: 11.5px/1 var(--mono);
+  background: var(--inset);
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+}
+
+.field {
+  display: block;
+}
+
+.hint + .field,
+.field + .field {
+  margin-top: 12px;
+}
+
+.field > span {
+  display: block;
+  font: var(--label);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-bottom: 5px;
+}
+
+input[type='text'],
+textarea {
+  width: 100%;
+  font: 12.5px/1.5 var(--mono);
+  padding: 8px 9px;
+  border: 1px solid var(--rule-2);
+  background: var(--inset);
+  color: var(--ink);
+  resize: vertical;
+}
+
+input[type='text']:focus,
+textarea:focus {
+  outline: 2px solid var(--led);
+  outline-offset: -1px;
+}
+
+/* ------------------------------------------------------------- status bar */
+
+.statusbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  border-top: 1px solid var(--edge);
+  background: var(--panel-2);
+}
+
+.status-text {
+  font-size: 12.5px;
+  color: var(--ink-2);
+}
+
+.spacer {
+  flex: 1;
+}
+
+/* ------------------------------------------------------------- colophon */
+
+.colophon {
+  max-width: 880px;
+  margin: 14px auto 0;
+  font-size: 11.5px;
+  line-height: 1.6;
+  color: var(--ink-3);
+}

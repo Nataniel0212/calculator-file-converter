@@ -1,0 +1,25 @@
+# personal machine-local shortcut, not part of the project
+memory.cmd
+
+# Third-party guidance fetched into the working copy, not written here and not
+# ours to redistribute. .claude/skills/README.md says what they are and how to
+# fetch them; the files themselves stay local.
+.claude/skills/*/
+
+node_modules/
+dist/
+apps/web/vendor/
+apps/desktop/out/
+*.log
+
+# never commit somebody's calculator documents, notes or programs
+samples/
+*.g1e
+*.G1E
+*.g1m
+*.G1M
+*.8xp
+*.8xl
+*.8xm
+*.83p
+*.82p

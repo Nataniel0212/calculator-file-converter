@@ -1,0 +1,38 @@
+{
+  "name": "calcconv",
+  "version": "0.1.0",
+  "description": "Batch converter for graphing calculator files: Casio .g1e documents, TI-83/84 .8xp programs, and TI lists and matrices, to text and back.",
+  "type": "module",
+  "bin": {
+    "calcconv": "bin/calcconv.js"
+  },
+  "files": [
+    "bin"
+  ],
+  "dependencies": {
+    "calcconv-core": "^0.1.0"
+  },
+  "keywords": [
+    "calculator",
+    "converter",
+    "ti-83",
+    "ti-84",
+    "ti-basic",
+    "8xp",
+    "fx-9860g",
+    "g1e",
+    "cli"
+  ],
+  "author": "Nataniel0212",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Nataniel0212/calculator-file-converter.git",
+    "directory": "apps/cli"
+  },
+  "homepage": "https://github.com/Nataniel0212/calculator-file-converter#readme",
+  "bugs": "https://github.com/Nataniel0212/calculator-file-converter/issues",
+  "engines": {
+    "node": ">=20"
+  }
+}

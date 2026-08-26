@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- the page loads nothing from anywhere: no scripts, styles or fonts off this folder -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; form-action 'none'; base-uri 'none'"
+    />
+    <title>File Converter — calculator files and txt</title>
+    <meta
+      name="description"
+      content="Convert Casio .g1e documents and TI-83/84 .8xp programs to plain text and back. Batch, drag and drop, entirely on your own machine."
+    />
+    <link rel="stylesheet" href="style.css" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%2316181a'/><rect x='5' y='6' width='22' height='11' fill='%23a4ba81'/><g fill='%2316200a'><rect x='7' y='8' width='3' height='3'/><rect x='12' y='8' width='3' height='3'/><rect x='7' y='12' width='8' height='3'/></g><g fill='%23a4ba81'><rect x='5' y='21' width='5' height='5'/><rect x='13' y='21' width='5' height='5'/><rect x='21' y='21' width='6' height='5'/></g></svg>"
+    />
+  </head>
+  <body>
+    <div class="app">
+      <header class="titlebar">
+        <span class="mark" aria-hidden="true"></span>
+        <h1>File Converter</h1>
+        <span class="titlebar-sub">Graphing calculator files</span>
+      </header>
+
+      <div class="body">
+        <!-- 1 · what to convert -------------------------------------------->
+        <section class="group">
+          <h2 class="group-title">Conversion</h2>
+
+          <div class="row">
+            <span class="row-label" id="direction-label">Convert</span>
+            <div class="row-control radios" role="radiogroup" aria-labelledby="direction-label" id="direction"></div>
+          </div>
+
+          <div class="row" id="function-row">
+            <label class="row-label" for="function">Text becomes</label>
+            <div class="row-control">
+              <select id="function" class="control"></select>
+              <p class="hint">
+                Used only for a <code>.txt</code> that does not say which calculator it came
+                from. One converted here says so in its own first line.
+              </p>
+              <details class="limits-box" id="format-limits">
+                <summary id="format-summary"></summary>
+                <ul class="limits" id="format-notes"></ul>
+              </details>
+            </div>
+          </div>
+
+          <div class="row" id="data-row" hidden>
+            <label class="row-label" for="data-function">Numbers become</label>
+            <div class="row-control">
+              <select id="data-function" class="control"></select>
+              <details class="limits-box" id="data-limits">
+                <summary>Numbers only, 999 to a list, 14 digits each</summary>
+                <ul class="limits" id="data-notes"></ul>
+              </details>
+            </div>
+          </div>
+
+          <div class="row" id="translit-row">
+            <span class="row-label">Options</span>
+            <div class="row-control">
+              <label class="check">
+                <input type="checkbox" id="translit" checked />
+                <span>Substitute characters the Casio cannot display</span>
+              </label>
+            </div>
+          </div>
+        </section>
+
+        <!-- 2 · what to convert it from ------------------------------------>
+        <section class="group">
+          <div class="group-head">
+            <h2 class="group-title">Files</h2>
+            <div class="group-actions">
+              <input
+                id="filter"
+                class="control filter"
+                type="search"
+                placeholder="Filter by name"
+                aria-label="Filter the list by file name"
+                hidden
+              />
+              <span class="muted" id="filter-count"></span>
+              <button id="add-files" class="btn" type="button">Add files…</button>
+              <button id="clear" class="btn quiet" type="button">Clear list</button>
+            </div>
+          </div>
+
+          <div class="row source-row">
+            <span class="row-label">Read from</span>
+            <div class="row-control dest">
+              <button id="choose-source" class="btn" type="button">Choose folder…</button>
+              <span class="path" id="source-path">Nothing added yet</span>
+            </div>
+          </div>
+
+          <div id="dropzone" class="filelist" tabindex="0">
+            <table class="queue" id="queue" hidden>
+              <thead>
+                <tr>
+                  <th class="col-status"><span class="sr">Status</span></th>
+                  <th class="col-name">Input</th>
+                  <th class="col-out">Output</th>
+                  <th class="col-num">Lines</th>
+                  <th class="col-num">Size</th>
+                  <th class="col-act"><span class="sr">Remove</span></th>
+                </tr>
+              </thead>
+              <tbody id="queue-body"></tbody>
+            </table>
+            <p class="empty" id="empty">
+              Drop files or folders here, or use <b>Add files…</b>
+            </p>
+          </div>
+          <input id="filepicker" type="file" multiple hidden />
+        </section>
+
+        <!-- 3 · where it goes --------------------------------------------->
+        <section class="group">
+          <h2 class="group-title">Destination</h2>
+
+          <div class="row">
+            <span class="row-label">Save to</span>
+            <div class="row-control dest">
+              <button id="choose-folder" class="btn" type="button">Choose folder…</button>
+              <span class="path" id="dest-path">Downloads folder</span>
+            </div>
+          </div>
+
+          <div class="row" id="history-row" hidden>
+            <label class="row-label" for="history">Recent</label>
+            <div class="row-control">
+              <select id="history" class="control"></select>
+            </div>
+          </div>
+        </section>
+
+        <!-- 4 · preview ---------------------------------------------------->
+        <section class="group" id="detail" hidden>
+          <div class="group-head">
+            <h2 class="group-title" id="detail-name">Preview</h2>
+            <div class="group-actions">
+              <span class="muted" id="detail-stats"></span>
+              <button id="detail-close" class="btn quiet" type="button">Close</button>
+            </div>
+          </div>
+
+          <div class="preview">
+            <div class="preview-lcd">
+              <div class="lcd" id="screen" aria-live="polite"></div>
+              <p class="hint" id="screen-hint">
+                The screen fits 21 characters. Anything past that is shown inverted and wraps on
+                the calculator.
+              </p>
+              <label class="field" id="heading-field">
+                <span>Heading</span>
+                <input id="heading-input" type="text" maxlength="21" spellcheck="false" />
+              </label>
+            </div>
+            <div class="preview-text">
+              <label class="field">
+                <span>Contents</span>
+                <textarea id="text-input" spellcheck="false" rows="18"></textarea>
+              </label>
+              <p class="hint" id="escape-hint" hidden>
+                <code>\.</code> marks where two tokens must stay apart —
+                <code>L\.1</code> is the letter L then a 1, <code>L1</code> is the list.
+                <code>\\</code> is a backslash, <code>\xNN</code> a byte with no name.
+              </p>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- 5 · status bar and the one button that has an effect -------------->
+      <footer class="statusbar">
+        <span class="lamp" id="status-lamp" aria-hidden="true"></span>
+        <span class="status-text" id="status-text">No files</span>
+        <span class="spacer"></span>
+        <span class="muted" id="progress"></span>
+        <button id="start" class="btn primary" type="button" disabled>Convert and save</button>
+      </footer>
+    </div>
+
+    <p class="colophon">
+      Free and open source under the MIT licence. Files are read and written on your own
+      machine — nothing is uploaded anywhere.
+      <a href="https://github.com/Nataniel0212/calculator-file-converter">Source</a> ·
+      <a href="https://github.com/Nataniel0212/calculator-file-converter/blob/main/docs/G1E-FORMAT.md">G1E format</a> ·
+      <a href="https://github.com/Nataniel0212/calculator-file-converter/blob/main/docs/8XP-FORMAT.md">8XP format</a>
+    </p>
+
+    <script type="module" src="app.js"></script>
+  </body>
+</html>

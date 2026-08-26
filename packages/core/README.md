@@ -55,5 +55,20 @@ rather than a quiet substitution.
 
 Token names come from the [TI-Toolkit token sheets](https://github.com/TI-Toolkit/tokens) (CC0).
 
-MIT licensed. Not affiliated with, endorsed by, or sponsored by the
-manufacturers of the calculators whose files it reads.
+## Licence
+
+Copyright © 2026 Nataniel0212, under the GNU Affero General Public License
+v3.0.
+
+Worth knowing before you depend on this: the AGPL is contagious. Import these
+codecs and your own project takes on the same terms, and if you run it as a
+service you owe its users your source. That is deliberate, but it is a real
+constraint on a library.
+
+If it does not suit what you are building,
+[ask](https://github.com/Nataniel0212/calculator-file-converter/issues) — a
+separate licence on other terms is available, and the answer is not
+automatically no.
+
+Not affiliated with, endorsed by, or sponsored by the manufacturers of the
+calculators whose files it reads.

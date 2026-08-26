@@ -29,7 +29,7 @@
     "file-format"
   ],
   "author": "Nataniel0212",
-  "license": "MIT",
+  "license": "AGPL-3.0-only",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Nataniel0212/calculator-file-converter.git",

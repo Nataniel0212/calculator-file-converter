@@ -3,7 +3,7 @@
 Guidance Claude Code loads when working in this repository. Neither is written
 here, and neither is committed: they are other people's work under their own
 terms, so this file records what they are and how to fetch them rather than
-redistributing them inside an MIT project.
+redistributing them inside this one.
 
 ```sh
 mkdir -p .claude/skills/frontend-design .claude/skills/ux-heuristics

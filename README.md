@@ -180,7 +180,17 @@ docs              file format notes
 
 ## Licence and independence
 
-MIT — see [LICENSE](LICENSE).
+Copyright © 2026 Nataniel0212. Licensed under the **GNU Affero General Public
+License v3.0** — see [LICENSE](LICENSE).
+
+In short: use it, study it, change it, share it, freely. If you run a modified
+version as a service other people use, you have to offer them its source too.
+
+If that does not suit you — you want to build something closed on top of this,
+or ship it inside a commercial product — open an
+[issue](https://github.com/Nataniel0212/calculator-file-converter/issues) and
+ask. A separate licence on different terms is available, and the answer is not
+automatically no.
 
 This is an independent project. It is not affiliated with, endorsed by, or
 sponsored by the manufacturers of the calculators whose files it reads.

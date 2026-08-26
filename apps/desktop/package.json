@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "description": "Desktop build of File Converter, for Casio fx-9860G and TI-83/84 graphing calculator files.",
+  "license": "AGPL-3.0-only",
   "type": "module",
   "main": "main.js",
   "scripts": {

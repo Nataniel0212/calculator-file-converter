@@ -2,7 +2,7 @@
   "name": "calculator-file-converter",
   "private": true,
   "description": "Convert graphing calculator files to plain text and back, in the browser, from the command line, or as a desktop app.",
-  "license": "MIT",
+  "license": "AGPL-3.0-only",
   "author": "Nataniel0212",
   "repository": {
     "type": "git",

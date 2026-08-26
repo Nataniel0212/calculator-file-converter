@@ -31,5 +31,11 @@ Run `calcconv --help` for every flag.
 
 **[Full documentation, and the browser and desktop versions →](https://github.com/Nataniel0212/calculator-file-converter)**
 
-MIT licensed. Not affiliated with, endorsed by, or sponsored by the
-manufacturers of the calculators whose files it reads.
+Copyright © 2026 Nataniel0212, under the GNU Affero General Public License
+v3.0. Free to use, study, change and share; run a modified version as a service
+and you owe its users the source. Want it on other terms for something closed
+or commercial? [Ask](https://github.com/Nataniel0212/calculator-file-converter/issues) —
+a separate licence is available.
+
+Not affiliated with, endorsed by, or sponsored by the manufacturers of the
+calculators whose files it reads.

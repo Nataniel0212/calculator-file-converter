@@ -21,6 +21,10 @@ jobs:
       # The CLI reaches the codecs by package name, so the workspace has to be
       # linked before any of the steps below can run it.
       - run: npm ci
+      # apps/web imports the codecs from a generated copy under vendor/, which
+      # is not committed. Without it the web app does not typecheck, and does
+      # not run either — this is the same step serving the app performs.
+      - run: node scripts/sync-core.js
       - run: npm run typecheck
       - run: node --test "packages/core/test/*.test.js"
       - name: command line smoke test

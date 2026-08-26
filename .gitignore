@@ -6,6 +6,10 @@ memory.cmd
 # fetch them; the files themselves stay local.
 .claude/skills/*/
 
+# Editor runtime state, nothing to do with the project
+.claude/*.lock
+.claude/settings.local.json
+
 node_modules/
 dist/
 apps/web/vendor/
